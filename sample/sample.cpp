@@ -89,54 +89,29 @@ int _tmain(int argc, _TCHAR* argv[])
     return EXIT_FAILURE;
   }
   
+  // シェーダのプログラムオブジェクトを作成する
+  const GLuint program(glCreateProgram());
+
   // バーテックスシェーダオブジェクトを作成する
   const GLuint vsh(glCreateShader(GL_VERTEX_SHADER));
 
   // バーテックスシェーダのソースプログラム
-  GLchar *vsrc[] =
-  {
-    "#version 330\n",
-    "",
-    "// 頂点データ",
-    "int vec2 position;",
-    "",
-    "void main()",
-    "{",
-    "  gl_Position = vec4(pv, 0.0, 1.0);",
-    "}"
-  };
+  const GLchar *const vsrc =
+    "#version 330\n"
+    "\n"
+    "// 頂点データ\n"
+    "int vec2 position;\n"
+    "\n"
+    "void main()\n"
+    "{\n"
+    "  gl_Position = vec4(pv, 0.0, 1.0);\n"
+    "}";
 
   // バーテックスシェーダのソースプログラムを読み込む
-  glShaderSource(vsh, sizeof vsrc / sizeof vsrc[0], vsrc, nullptr);
+  glShaderSource(vsh, 1, &vsrc, nullptr);
 
   // バーテックスシェーダのソースプログラムをコンパイルする
   glCompileShader(vsh);
-
-  // フラグメントシェーダオブジェクトを作成する
-  const GLuint fsh(glCreateShader(GL_FRAGMENT_SHADER));
-
-  // フラグメントシェーダのソースプログラム
-  GLchar *fsrc[] =
-  {
-    "#version 330\n",
-    "",
-    "// 画素データ",
-    "out vec4 fc;",
-    "",
-    "void main()",
-    "{",
-    "  fc = vec4(1.0, 1.0, 0.0, 1.0);",
-    "}"
-  };
-
-  // フラグメントシェーダのソースプログラムを読み込む
-  glShaderSource(fsh, sizeof fsrc / sizeof fsrc[0], fsrc, nullptr);
-
-  // フラグメントシェーダのソースプログラムをコンパイルする
-  glCompileShader(fsh);
-
-  // シェーダのプログラムオブジェクトを作成する
-  const GLuint program(glCreateProgram());
 
   // バーテックスシェーダのシェーダオブジェクトをプログラムオブジェクトに組み込む
   if (printShaderInfoLog(vsh, "vertex shader"))
@@ -144,6 +119,30 @@ int _tmain(int argc, _TCHAR* argv[])
     // プログラムオブジェクトにシェーダオブジェクトを取り付ける
     glAttachShader(program, vsh);
   }
+
+  // 取り付け済みのシェーダオブジェクトを削除する
+  glDeleteShader(vsh);
+
+  // フラグメントシェーダオブジェクトを作成する
+  const GLuint fsh(glCreateShader(GL_FRAGMENT_SHADER));
+
+  // フラグメントシェーダのソースプログラム
+  const GLchar *const fsrc =
+    "#version 330\n"
+    "\n"
+    "// 画素データ\n"
+    "out vec4 fc;\n"
+    "\n"
+    "void main()\n"
+    "{\n"
+    "  fc = vec4(1.0, 1.0, 0.0, 1.0);\n"
+    "}";
+
+  // フラグメントシェーダのソースプログラムを読み込む
+  glShaderSource(fsh, 1, &fsrc, nullptr);
+
+  // フラグメントシェーダのソースプログラムをコンパイルする
+  glCompileShader(fsh);
 
   // フラグメントシェーダのシェーダオブジェクトをプログラムオブジェクトに組み込む
   if (printShaderInfoLog(fsh, "fragment shader"))
@@ -153,7 +152,6 @@ int _tmain(int argc, _TCHAR* argv[])
   }
 
   // 取り付け済みのシェーダオブジェクトを削除する
-  glDeleteShader(vsh);
   glDeleteShader(fsh);
 
   // バーテックスシェーダの in 変数 pv を 0 番のバッファオブジェクトに割り当てる
@@ -168,12 +166,12 @@ int _tmain(int argc, _TCHAR* argv[])
   // プログラムオブジェクトが作成できたかどうかチェックする
   if (printProgramInfoLog(program) == GL_FALSE)
   {
-	// 作成できなかったときはプログラムオブジェクトを削除する
+    // 作成できなかったときはプログラムオブジェクトを削除する
     glDeleteProgram(program);
 
-	// シェーダプログラムのビルドに失敗した
-	MessageBox(NULL, TEXT("シェーダプログラムがビルドできませんでした"), TEXT("4D Sensor"), MB_OK);
-	return EXIT_FAILURE;
+    // シェーダプログラムのビルドに失敗した
+    MessageBox(NULL, TEXT("シェーダプログラムがビルドできませんでした"), TEXT("4D Sensor"), MB_OK);
+    return EXIT_FAILURE;
   }
 
   // 頂点配列オブジェクトを作成する
