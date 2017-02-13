@@ -17,6 +17,19 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# NuGet files
+/packages/
+
+# Intelisense
+/ipch/
+*.sdf
+*.opensdf
+*.suo
+
+# Binaries
+Debug/
+Release/
+
 # =========================
 # Operating System Files
 # =========================
