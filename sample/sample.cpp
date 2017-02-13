@@ -165,11 +165,15 @@ int _tmain(int argc, _TCHAR* argv[])
   // シェーダのプログラムオブジェクトをリンクする
   glLinkProgram(program);
 
-  // プログラムオブジェクトが作成できなければ終了する
+  // プログラムオブジェクトが作成できたかどうかチェックする
   if (printProgramInfoLog(program) == GL_FALSE)
   {
+	// 作成できなかったときはプログラムオブジェクトを削除する
     glDeleteProgram(program);
-    return EXIT_FAILURE;
+
+	// シェーダプログラムのビルドに失敗した
+	MessageBox(NULL, TEXT("シェーダプログラムがビルドできませんでした"), TEXT("4D Sensor"), MB_OK);
+	return EXIT_FAILURE;
   }
 
   // 頂点配列オブジェクトを作成する
