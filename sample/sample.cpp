@@ -100,12 +100,12 @@ int _tmain(int argc, _TCHAR* argv[])
     "#version 330\n"
     "\n"
     "// 頂点データ\n"
-    "int vec2 position;\n"
+    "in vec2 pv;\n"
     "\n"
     "void main()\n"
     "{\n"
     "  gl_Position = vec4(pv, 0.0, 1.0);\n"
-    "}";
+    "}\n";
 
   // バーテックスシェーダのソースプログラムを読み込む
   glShaderSource(vsh, 1, &vsrc, nullptr);
