@@ -204,6 +204,9 @@ int _tmain(int argc, _TCHAR* argv[])
     return EXIT_FAILURE;
   }
 
+  // uniform 変数の場所を得る
+  const GLint mLoc(glGetUniformLocation(program, "m"));
+
   // 頂点配列オブジェクトを作成する
   GLuint vao;
   glGenVertexArrays(1, &vao);
@@ -239,6 +242,9 @@ int _tmain(int argc, _TCHAR* argv[])
   // 背景色を指定する
   glClearColor(0.3f, 0.4f, 0.5f, 0.0f);
 
+  // フレーム数
+  int frame(0);
+
   // ウィンドウが開いている間処理を繰り返す
   while (!glfwWindowShouldClose(window))
   {
@@ -248,6 +254,19 @@ int _tmain(int argc, _TCHAR* argv[])
     // プログラムオブジェクトを指定する
     glUseProgram(program);
 
+    // 変換行列を作成する
+    const GLfloat r(static_cast<GLfloat>(frame++) * 0.001f);
+    const GLfloat m[] =
+    {
+      cos(r), -sin(r), 0.0, 0.0,
+      sin(r), cos(r), 0.0, 0.0,
+      0.0, 0.0, 1.0, 0.0,
+      0.0, 0.0, 0.0, 1.0
+    };
+
+    // uniform 変数に値を設定する
+    glUniformMatrix4fv(mLoc, 1, GL_FALSE, m);
+
     // 図形を描画する
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
@@ -255,8 +274,8 @@ int _tmain(int argc, _TCHAR* argv[])
     // バッファを入れ替える
     glfwSwapBuffers(window);
 
-    // イベントの発生を待つ
-    glfwWaitEvents();
+    // イベントを取得する
+    glfwPollEvents();
   }
 
 	return EXIT_SUCCESS;
