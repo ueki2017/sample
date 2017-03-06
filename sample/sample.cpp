@@ -57,6 +57,50 @@ static GLboolean printProgramInfoLog(GLuint program)
   return static_cast<GLboolean>(status);
 }
 
+/*
+** シェーダのソースファイルを読み込んだメモリを返す
+*/
+static bool readShaderSource(const char *name, std::vector<GLchar> &src)
+{
+  // ファイル名が NULL なら false を返す
+  if (name == NULL) return false;
+
+  // ソースファイルを開く
+  std::ifstream file(name, std::ios::binary);
+  if (file.fail())
+  {
+    // 開けなかった
+    MessageBox(NULL, TEXT("シェーダのソースファイルが読み込めませんでした"), TEXT("4D Sensor"), MB_OK);
+    return false;
+  }
+
+  // ファイルの末尾に移動し現在位置（＝ファイルサイズ）を得る
+  file.seekg(0L, std::ios::end);
+  GLsizei length = static_cast<GLsizei>(file.tellg());
+
+  // ファイルサイズのメモリを確保
+  src.resize(length + 1);
+
+  // ファイルを先頭から読み込む
+  file.seekg(0L, std::ios::beg);
+  file.read(src.data(), length);
+  src[length] = '\0';
+
+  // 結果
+  bool status(true);
+
+  // 読み込めたかどうか調べる
+  if (file.bad())
+  {
+    // うまく読み込めなかった
+    MessageBox(NULL, TEXT("シェーダのソースファイルの読み込みに失敗しました"), TEXT("4D Sensor"), MB_OK);
+    status = false;
+  }
+  file.close();
+
+  return status;
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
   // GLFW を初期化する
@@ -96,19 +140,12 @@ int _tmain(int argc, _TCHAR* argv[])
   const GLuint vsh(glCreateShader(GL_VERTEX_SHADER));
 
   // バーテックスシェーダのソースプログラム
-  const GLchar *const vsrc =
-    "#version 330\n"
-    "\n"
-    "// 頂点データ\n"
-    "in vec2 pv;\n"
-    "\n"
-    "void main()\n"
-    "{\n"
-    "  gl_Position = vec4(pv, 0.0, 1.0);\n"
-    "}\n";
+  std::vector<GLchar> vsrc;
+  readShaderSource("simple.vert", vsrc);
 
   // バーテックスシェーダのソースプログラムを読み込む
-  glShaderSource(vsh, 1, &vsrc, nullptr);
+  const GLchar *const vsrcptr[] = { vsrc.data() };
+  glShaderSource(vsh, 1, vsrcptr, nullptr);
 
   // バーテックスシェーダのソースプログラムをコンパイルする
   glCompileShader(vsh);
@@ -127,19 +164,12 @@ int _tmain(int argc, _TCHAR* argv[])
   const GLuint fsh(glCreateShader(GL_FRAGMENT_SHADER));
 
   // フラグメントシェーダのソースプログラム
-  const GLchar *const fsrc =
-    "#version 330\n"
-    "\n"
-    "// 画素データ\n"
-    "out vec4 fc;\n"
-    "\n"
-    "void main()\n"
-    "{\n"
-    "  fc = vec4(1.0, 1.0, 0.0, 1.0);\n"
-    "}";
+  std::vector<GLchar> fsrc;
+  readShaderSource("simple.frag", fsrc);
 
   // フラグメントシェーダのソースプログラムを読み込む
-  glShaderSource(fsh, 1, &fsrc, nullptr);
+  const GLchar *const fsrcp[] = { fsrc.data() };
+  glShaderSource(fsh, 1, fsrcp, nullptr);
 
   // フラグメントシェーダのソースプログラムをコンパイルする
   glCompileShader(fsh);

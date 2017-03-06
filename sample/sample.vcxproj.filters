@@ -35,5 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="simple.vert" />
+    <None Include="simple.frag" />
   </ItemGroup>
 </Project>
