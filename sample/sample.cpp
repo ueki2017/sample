@@ -490,8 +490,14 @@ int _tmain(int argc, _TCHAR* argv[])
     const GLfloat r(static_cast<GLfloat>(frame++) * 0.001f);
     Matrix m(Matrix::rotate(r, 0.0f, 0.0f, 1.0f));
 
+    // ‹–ì•ÏŠ·s—ñ
+    Matrix v(Matrix::lookat(3.0f, 4.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f));
+
+    // “Š‰e•ÏŠ·s—ñ
+    Matrix q(Matrix::perspective(0.5f, 1.0f, 1.0, 10.0f));
+
     // uniform •Ï”‚É’l‚ğİ’è‚·‚é
-    glUniformMatrix4fv(mLoc, 1, GL_FALSE, m.get());
+    glUniformMatrix4fv(mLoc, 1, GL_FALSE, (q * v * m).get());
 
     // }Œ`‚ğ•`‰æ‚·‚é
     glBindVertexArray(vao);
