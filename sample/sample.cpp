@@ -492,6 +492,17 @@ int _tmain(int argc, _TCHAR* argv[])
     }
   }
 
+  // 頂点バッファオブジェクトのメモリを確保する
+  glBufferData(GL_ARRAY_BUFFER, sizeof v, v, GL_STATIC_DRAW);
+
+  // インデックス頂点バッファオブジェクトを作成する
+  GLuint ibo;
+  glGenBuffers(1, &ibo);
+
+  // インデックスの頂点バッファオブジェクトを選択する
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+
+  // インデックスデータ
   static GLuint index[height][width][2];
 
   for (int j = 0; j < height - 1; ++j)
@@ -503,8 +514,6 @@ int _tmain(int argc, _TCHAR* argv[])
     }
   }
 
-  // 頂点バッファオブジェクトのメモリを確保する
-  glBufferData(GL_ARRAY_BUFFER, sizeof v, v, GL_STATIC_DRAW);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof index, index, GL_STATIC_DRAW);
 
   // この頂点バッファオブジェクトの位置を 0 番の in 変数に割り当てる
@@ -551,7 +560,7 @@ int _tmain(int argc, _TCHAR* argv[])
     glBindVertexArray(vao);
     for (int j = 0; j < height - 1; ++j)
     {
-      glDrawElements(GL_TRIANGLE_STRIP, width * 2, GL_UNSIGNED_INT, index[j]);
+      glDrawElements(GL_TRIANGLE_STRIP, width * 2, GL_UNSIGNED_INT, static_cast<GLuint *>(nullptr) + width * 2 * j);
     }
 
     // バッファを入れ替える
