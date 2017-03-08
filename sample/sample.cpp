@@ -368,6 +368,9 @@ int _tmain(int argc, _TCHAR* argv[])
     return EXIT_FAILURE;
   }
   
+  // 隠面消去処理を有効にする
+  glEnable(GL_DEPTH_TEST);
+
   // シェーダのプログラムオブジェクトを作成する
   const GLuint program(glCreateProgram());
 
@@ -526,7 +529,7 @@ int _tmain(int argc, _TCHAR* argv[])
   while (!glfwWindowShouldClose(window))
   {
     // 画面を消去する
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // プログラムオブジェクトを指定する
     glUseProgram(program);
