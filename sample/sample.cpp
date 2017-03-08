@@ -419,6 +419,9 @@ int _tmain(int argc, _TCHAR* argv[])
   // バーテックスシェーダの in 変数 pv を 0 番のバッファオブジェクトに割り当てる
   glBindAttribLocation(program, 0, "pv");
 
+  // バーテックスシェーダの in 変数 cv を 1 番のバッファオブジェクトに割り当てる
+  glBindAttribLocation(program, 1, "cv");
+
   // フラグメントシェーダの out 変数 fc を 0 番のカラーバッファに割り当てる
   glBindFragDataLocation(program, 0, "fc");
 
@@ -454,22 +457,34 @@ int _tmain(int argc, _TCHAR* argv[])
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
   // 頂点データ
-  static GLfloat p[][2] =
+  struct Vertex
   {
-    { -0.5f, -0.5f },
-    {  0.5f, -0.5f },
-    {  0.5f,  0.5f },
-    { -0.5f,  0.5f }
+    GLfloat p[2]; // 位置
+    GLfloat c[3]; // 色
+  };
+
+  static Vertex v[] =
+  {
+    { -0.5f, -0.5f, 1.0f, 0.0f, 0.0f },
+    {  0.5f, -0.5f, 0.0f, 1.0f, 0.0f },
+    {  0.5f,  0.5f, 0.0f, 0.0f, 1.0f },
+    { -0.5f,  0.5f, 1.0f, 1.0f, 1.0f }
   };
 
   // 頂点バッファオブジェクトのメモリを確保する
-  glBufferData(GL_ARRAY_BUFFER, sizeof p, p, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof v, v, GL_STATIC_DRAW);
 
-  // この頂点バッファオブジェクトを 0 番の in 変数に割り当てる
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+  // この頂点バッファオブジェクトの位置を 0 番の in 変数に割り当てる
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof (Vertex), nullptr);
 
   // この in 変数を有効にする
   glEnableVertexAttribArray(0);
+
+  // この頂点バッファオブジェクトの色を 1 番の in 変数に割り当てる
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof (Vertex), static_cast<GLfloat *>(nullptr) + 2);
+
+  // この in 変数を有効にする
+  glEnableVertexAttribArray(1);
 
   // 背景色を指定する
   glClearColor(0.3f, 0.4f, 0.5f, 0.0f);
