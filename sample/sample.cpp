@@ -4,6 +4,9 @@
 #include "stdafx.h"
 #pragma comment(lib, "opengl32.lib")
 
+// メッシュの幅と高さ
+const int width(256), height(256);
+
 //
 // 変換行列
 //
@@ -459,23 +462,50 @@ int _tmain(int argc, _TCHAR* argv[])
   // 頂点データ
   struct Vertex
   {
-    GLfloat p[2]; // 位置
+    GLfloat p[3]; // 位置
     GLfloat c[3]; // 色
   };
 
-  static Vertex v[] =
+  static Vertex v[height][width];
+
+  for (int j = 0; j < height; ++j)
   {
-    { -0.5f, -0.5f, 1.0f, 0.0f, 0.0f },
-    {  0.5f, -0.5f, 0.0f, 1.0f, 0.0f },
-    {  0.5f,  0.5f, 0.0f, 0.0f, 1.0f },
-    { -0.5f,  0.5f, 1.0f, 1.0f, 1.0f }
-  };
+    const GLfloat y(2.0f * static_cast<GLfloat>(j) / static_cast<GLfloat>(height - 1) - 1.0f);
+    for (int i = 0; i < width; ++i)
+    {
+      const GLfloat x(2.0f * static_cast<GLfloat>(i) / static_cast<GLfloat>(width - 1) - 1.0f);
+      const GLfloat r(hypot(x, y) * 10.0f);
+      const GLfloat z(sin(r) / r);
+
+      // 位置
+      v[j][i].p[0] = x;
+      v[j][i].p[1] = y;
+      v[j][i].p[2] = z;
+
+      // 色
+      v[j][i].c[0] = z;
+      v[j][i].c[0] = 1.0f - z;
+      v[j][i].c[0] = 1.0f - z;
+    }
+  }
+
+  static GLuint index[height][width][2];
+
+  for (int j = 0; j < height - 1; ++j)
+  {
+    for (int i = 0; i < width; ++i)
+    {
+      index[j][i][0] = j * width + i;
+      index[j][i][1] = index[j][i][0] + width;
+    }
+  }
 
   // 頂点バッファオブジェクトのメモリを確保する
   glBufferData(GL_ARRAY_BUFFER, sizeof v, v, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof index, index, GL_STATIC_DRAW);
 
   // この頂点バッファオブジェクトの位置を 0 番の in 変数に割り当てる
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof (Vertex), nullptr);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof (Vertex), nullptr);
 
   // この in 変数を有効にする
   glEnableVertexAttribArray(0);
@@ -516,7 +546,10 @@ int _tmain(int argc, _TCHAR* argv[])
 
     // 図形を描画する
     glBindVertexArray(vao);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    for (int j = 0; j < height - 1; ++j)
+    {
+      glDrawElements(GL_TRIANGLE_STRIP, width * 2, GL_UNSIGNED_INT, index[j]);
+    }
 
     // バッファを入れ替える
     glfwSwapBuffers(window);
